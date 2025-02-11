@@ -1,6 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\documentosController;
+use App\Http\Controllers\Api\Admin\DocumentoController as Administrador;
+use App\Http\Controllers\Api\Editor\DocumentoController as Editor;
+use App\Http\Controllers\Api\Create\DocumentoController as Creador;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -19,47 +23,40 @@ use Illuminate\Support\Facades\Route;
 //    return $request->user();
 //});
 
-Route::group(['middleware' => 'auth:sanctum'],function(){
+Route::get('/documentos',[documentosController::class,'index'])->name('documentos.index');
+
+Route::post('/documentos',[documentosController::class,'store'])->name('documentos.store');
+
+Route::put('/documentos/{id}',[documentosController::class,'update'])->name('documentos.update');
+
+Route::patch('/documentos/{id}',[documentosController::class,'cambiarEstado'])->name('documentos.estado');
+
+Route::get('/documentos/{id}',[documentosController::class,'show'])->name('documentos.show');
+
+
+
+//rutas publicas
+Route::post('/auth/register',[AuthController::class,'register']);
+Route::post('/auth/login',[AuthController::class,'login']);
+
+//rutas privada(necesitan autenticacion)
+Route::group(['middleware'=> 'auth:sanctum'], function () {
+
+    Route::post('/auth/logout',[AuthController::class,'logout']);
+
+    //Route::get('/documentos',[documentosController::class,'index'])->name('documentos.index');
 
     
-    //Route::apiResource('/documentos',[documentosController::class,'index'])->name('documentos.index');
+
+    //Administrador
+    Route::apiResource('/admin/documentos',Administrador::class);
+    Route::patch('/admin/documentos/estado/{id}',[Administrador::class,'cambiarEstado']);
     
-});
+    //editor
+    Route::apiResource('/editor/documentos',Editor::class);
+    Route::patch('/editor/documentos/estado/{id}',[Editor::class,'cambiarEstado']);
 
-    Route::get('/documentos',[documentosController::class,'index'])->name('documentos.index');
-
-    Route::post('/documentos',[documentosController::class,'store'])->name('documentos.store');
-
-    Route::put('/documentos/{id}',[documentosController::class,'update'])->name('documentos.update');
-
-    Route::patch('/documentos/{id}',[documentosController::class,'cambiarEstado'])->name('documentos.estado');
-
-    Route::get('/documentos/{id}',[documentosController::class,'show'])->name('documentos.show');
-
-/*
-Route::delete('/estado/{id}',function(){
-    return 'estado';
-});
-*/
-
-Route::middleware('auth')->group(function () {
-    /*
-    Route::get('/documentos',function(){
-        return 'documentos';
-    });
-    Route::get('/documentos/{id}',function(){
-        return 'obteniendo documentos';
-    });
-    Route::post('/documentos/{id}',function(){
-        return 'documentos creando';
-    });
-    Route::put('/estado',function(){
-        return 'estado actualizado';
-    });
-
-    Route::delete('/estado/{id}',function(){
-        return 'estado';
-    });
-    */
+    //creador
+    Route::apiResource('/create/documentos',Creador::class);
     
 });

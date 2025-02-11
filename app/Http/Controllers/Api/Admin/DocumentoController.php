@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\Admin;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Anio;
 use App\Models\Documento;
 use App\Models\EstadoDocumento;
-use App\Models\Mes;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
-class documentosController extends Controller
+class DocumentoController extends Controller
 {
-    //
 
-    
+    //ADMINISTRADOR 
     public function index(){
         //obtener la fecha actual
         $anioActual = (int)(date("Y"));
@@ -237,5 +236,5 @@ class documentosController extends Controller
 
         return response()->json($data,200);
     }
-    
+
 }

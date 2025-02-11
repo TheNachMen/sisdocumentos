@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\Editor;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Anio;
 use App\Models\Documento;
 use App\Models\EstadoDocumento;
-use App\Models\Mes;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
-class documentosController extends Controller
+class DocumentoController extends Controller
 {
-    //
 
-    
+    //EDITOR
     public function index(){
         //obtener la fecha actual
         $anioActual = (int)(date("Y"));
@@ -63,68 +63,6 @@ class documentosController extends Controller
         }
         
         return response()->json(compact("estadosActuales"),200);
-    }
-
-    public function store(Request $request){
-        $fechaActual = date("Y-m-d");
-        $mesActual = (int)substr(date("m"),1);
-        
-        $anioActual = date("Y");
-        $idanio = Anio::where("numero",$anioActual)->value("id_anio");
-
-        $validator = Validator::make($request->all(), [
-            'titulo'=> 'required|max:191',
-            'descripcion'=> 'required|max:255',
-            'archivo'=>'required',
-        ]);
-        if ($validator->fails()) {
-            $data=[
-                'message'=>'Error en la validacion de los datos',
-                'errors' => $validator->errors(), 
-                'status'=> 400
-            ];
-            return response()->json($data,400);
-        };
-        $documento = Documento::create([
-                'titulo' => $request->titulo,
-                'descripcion'=> $request->descripcion,
-                'archivo' => $request->archivo,
-                'estado' => 'abierto'
-        ]);
-        if(!$documento){
-            $data = [
-                'message'=> 'Error al crear el documento',
-                'status' => 500
-            ];
-            return response()->json($data,400);
-        }else{
-            $estadodocumento= EstadoDocumento::create([
-            'fecha_modificacion'=> $fechaActual,
-            'id_documento' => $documento->id_documento,
-            'id_mes' =>$mesActual,
-            'id_anio'=> $idanio
-            ]);
-            if(!$estadodocumento){
-                $data = [
-                    'message'=> 'Error al crear el estado del documento',
-                    'status' => 500
-                ];
-                return response()->json($data,400);
-            }
-
-        }
-        
-        $data=[
-            [
-            'documento' => $documento,
-            'status' => 201
-            ],
-            [
-            'estado_documento' => $estadodocumento,
-            'status' => 201 
-            ]
-        ];
-        return response()->json($data,201);
     }
 
     public function update(Request $request, $id){
@@ -237,5 +175,5 @@ class documentosController extends Controller
 
         return response()->json($data,200);
     }
-    
+
 }

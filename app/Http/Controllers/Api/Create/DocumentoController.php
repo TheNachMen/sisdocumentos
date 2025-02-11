@@ -1,18 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\Create;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use App\Models\Anio;
 use App\Models\Documento;
 use App\Models\EstadoDocumento;
-use App\Models\Mes;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
-class documentosController extends Controller
+class DocumentoController extends Controller
 {
-    //
 
-    
+    //CREADOR
     public function index(){
         //obtener la fecha actual
         $anioActual = (int)(date("Y"));
@@ -127,100 +126,6 @@ class documentosController extends Controller
         return response()->json($data,201);
     }
 
-    public function update(Request $request, $id){
-        $fechaActual = date("Y-m-d");
-        $mesActual = (int)substr(date("m"),1);
-        
-        $anioActual = date("Y");
-        $idanio = Anio::where("numero",$anioActual)->value("id_anio");
-
-        $documento = Documento::find($id);
-        if(!$documento){
-            $data=[
-                'message'=> 'Documento no encontrado',
-                'status' => 404
-            ];
-            return response()->json($data,404);
-        }
-
-        $validator = Validator::make($request->all(), [
-            'titulo'=> 'required|max:191',
-            'descripcion'=>'required|max:255',
-            'archivo'=> 'required|max:250'
-        ]);
-        if ($validator->fails()) {
-            $data=[
-                'message'=>'Error en la validacion de los datos',
-                'errors' => $validator->errors(), 
-                'status'=> 400
-            ];
-            return response()->json($data,400);
-        }
-        $documento->titulo = $request->titulo;
-        $documento->descripcion = $request->descripcion;
-        $documento->archivo = $request->archivo;
-        $documento->save();
-
-        $estadodocumento= EstadoDocumento::create([
-            'fecha_modificacion'=> $fechaActual,
-            'id_documento' => $documento->id_documento,
-            'id_mes' =>$mesActual,
-            'id_anio'=> $idanio
-            ]);
-            if(!$estadodocumento){
-                $data = [
-                    'message'=> 'Error al crear el estado del documento',
-                    'status' => 500
-                ];
-                return response()->json($data,400);
-            }
-        $data=[
-            'message'=> 'Datos de documento actualizado',
-            [
-            'documento' => $documento,
-            'status' => 200
-            ],
-            [
-            'estado_documento' => $estadodocumento,
-            'status' => 200 
-            ]
-        ];
-        return response()->json($data,201);
-    }
-
-    public function cambiarEstado(Request $request, $id){
-        $documento = Documento::find($id);
-        if(!$documento){
-            $data=[
-                'message'=> 'Documento no encontrado',
-                'status' => 404
-            ];
-            return response()->json($data,404);
-        }
-        $validator = Validator::make($request->all(), [
-            'titulo'=> 'required|max:191',
-            'descripcion'=>'required|max:255',
-            'archivo'=> 'required|max:250'
-        ]);
-        if ($validator->fails()) {
-            $data=[
-                'message'=>'Error en la validacion de los datos',
-                'errors' => $validator->errors(), 
-                'status'=> 400
-            ];
-            return response()->json($data,400);
-        }
-        $documento->estado = $request->estado;
-        $documento->save();
-        $data=[
-            'message'=> 'Estado actualizado',
-            'status' => 200
-            
-        ];
-        return response()->json($data,201);
-        
-    }
-
     public function show($id){
         $documento = Documento::find($id);
         if(!$documento){
@@ -237,5 +142,4 @@ class documentosController extends Controller
 
         return response()->json($data,200);
     }
-    
 }

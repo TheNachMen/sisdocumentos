@@ -32,5 +32,16 @@ class RoleSeeder extends Seeder
             'name'=> 'documentos.estado',
             'description'=>'cambiar estado de documentos'])->syncRoles( [$admin,$editor]);
         
+        Permission::create([
+            'name'=> 'users.index',
+            'description' => 'Ver usuarios'])->assignRole($admin);
+        
+        Permission::create([
+            'name'=> 'users.edit',
+            'description' => 'Editar Usuarios'])->assignRole($admin);
+
+        Permission::create([
+            'name'=> 'users.destroy',
+            'description' => 'Eliminar usuarios'])->assignRole($admin);
     }
 }
